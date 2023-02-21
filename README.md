@@ -38,3 +38,4 @@ To do (inform others if working on specific files, or make a branch to not mess 
 
 ## Submission
 - Exactly one .pdf (report) and one .zip (code) file must be submitted. NO DATA.
+- Report should be 5-10 pages
