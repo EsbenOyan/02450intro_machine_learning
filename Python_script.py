@@ -1,1 +1,4 @@
-a = 'test 123'
+import pandas as pd
+
+data = pd.read_csv('./Data/Classification.data')
+
