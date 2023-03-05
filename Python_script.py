@@ -1,52 +1,52 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
-
+import seaborn as sns
+import numpy as np
 
 data = pd.read_csv('./Data/Classification.data')
 
-"""virker ikke
+# Select the columns to plot
+mean = data.iloc[:, 2:12]
+sde = data.iloc[:, 12:22]
+worst = data.iloc[:, 22:32]
 
-data2 = data
-# Create a scaler object
-scaler = MinMaxScaler()
+# Set the x-axis tick labels
+labels = ['radius', 'texture', 'perimeter', 'area', 'smoothness',
+          'compactness', 'concavity', 'concave points', 'symmetry',
+          'fractal dimension']
 
-# Normalize the second column of the DataFrame
-data2.iloc[:,2:] = scaler.fit_transform(data.iloc[:, 2:].values.reshape(-1, 1))
-"""
-data_subset_mean = data.iloc[:, 2:12]
+# Create the boxplots
+sns.set(style="ticks")
+fig_mean = plt.figure(figsize=(8, 6))
+sns.boxplot(data=mean, palette="pastel", orient="v")
+sns.despine(trim=True)
+plt.xticks(rotation=90)
+plt.xticks(np.arange(len(labels)), labels)
+plt.ylim(mean.min().min(), mean.max().max())
+plt.title("Mean of attributes")
+fig_mean.savefig('boxplot_mean.png', bbox_inches = 'tight')
 
-data_subset_mean = data_subset_mean.astype(int)
+sns.set(style="ticks")
+fig_sde =plt.figure(figsize=(8, 6))
+sns.boxplot(data=sde, palette="pastel", orient="v")
+sns.despine(trim=True)
+plt.xticks(rotation=90)
+plt.xticks(np.arange(len(labels)), labels)
+plt.ylim(sde.min().min(), sde.max().max())
+plt.title("Standard error for attributes")
+fig_sde.savefig('boxplot_sde.png', bbox_inches = 'tight')
 
-# Create a boxplot of the selected columns
-plt.boxplot(data_subset_mean)
-plt.title('Boxplot of means')
-plt.xlabel('Means')
-plt.ylabel('Value')
-plt.show()
-print(data_subset_mean.head())
-print('work1')
+sns.set(style="ticks")
+fig_worst = plt.figure(figsize=(8,6))
+sns.boxplot(data=worst, palette="pastel", orient="v")
+sns.despine(trim=True)
+plt.xticks(rotation=90)
+plt.xticks(np.arange(len(labels)), labels)
+plt.ylim(worst.min().min(), worst.max().max())
+plt.title('"Worst" value for attributes')
+fig_worst.savefig('boxplot_worst.png', bbox_inches = 'tight')
 
-data_subset_SD = data.iloc[:, 12:22]
 
-data_subset_SD = data_subset_SD.astype(int)
-
-# Create a boxplot of the selected columns
-plt.boxplot(data_subset_SD)
-plt.title('Boxplot of standard deviation')
-plt.xlabel('Means')
-plt.ylabel('Value')
-plt.show()
-print('work2')
-
-data_subset_worst = data.iloc[:, 22:32]
-
-data_subset_worst = data_subset_worst.astype(int)
-
-# Create a boxplot of the selected columns
-plt.boxplot(data_subset_worst)
-plt.title('Boxplot of worst values')
-plt.xlabel('Means')
-plt.ylabel('Value')
-plt.show()
-print('work3')
+# Show the plot
+# plt.show()
