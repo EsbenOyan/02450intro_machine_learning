@@ -1,15 +1,25 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.decomposition import PCA
 import seaborn as sns
 import numpy as np
 
 data = pd.read_csv('./Data/Classification.data')
-
 # Select the columns to plot
 mean = data.iloc[:, 2:12]
 sde = data.iloc[:, 12:22]
 worst = data.iloc[:, 22:32]
+
+#log transform the subdatasets
+mean.replace([np.inf, -np.inf, np.nan], 0, inplace = True)
+mean = np.log2(mean.where(mean > 0))
+
+sde.replace([np.inf, -np.inf, np.nan], 0, inplace = True)
+sde = np.log2(sde.where(sde > 0))
+
+worst.replace([np.inf, -np.inf, np.nan], 0, inplace = True)
+worst = np.log2(worst.where(worst > 0))
 
 # Set the x-axis tick labels
 labels = ['radius', 'texture', 'perimeter', 'area', 'smoothness',
@@ -47,6 +57,12 @@ plt.ylim(worst.min().min(), worst.max().max())
 plt.title('"Worst" value for attributes')
 fig_worst.savefig('boxplot_worst.png', bbox_inches = 'tight')
 
-
 # Show the plot
 # plt.show()
+
+################################################################
+
+mean = data.iloc[:, 2:12]
+sde = data.iloc[:, 12:22]
+worst = data.iloc[:, 22:32]
+
