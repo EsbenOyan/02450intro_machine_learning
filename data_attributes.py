@@ -119,15 +119,3 @@ def getSpecificColNames() -> tuple[list, list, list, list]:
     colNamesOther = ['outcome', 'time', 'tumor size', 'lymph node status']
 
     return colNamesMeans, colNamesStd, colNamesExt, colNamesOther
-
-
-def summarizeData(dfjoint: pd.DataFrame, printToConsole = True, save = False) -> pd.DataFrame:
-    summarizedData = dfjoint.describe()
-    if save:
-        summarizedData.to_csv('data_summary.csv')
-    if printToConsole:
-        print(summarizedData)
-
-    return summarizedData
-
-dfjoint, dfRec, dfClas = dataPreprocess()
