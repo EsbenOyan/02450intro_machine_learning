@@ -62,7 +62,3 @@ fig_worst.savefig('boxplot_worst.png', bbox_inches = 'tight')
 
 ################################################################
 
-mean = data.iloc[:, 2:12]
-sde = data.iloc[:, 12:22]
-worst = data.iloc[:, 22:32]
-
