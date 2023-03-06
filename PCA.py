@@ -66,21 +66,28 @@ plt.show()
 
 ## Data preprocessing
 
+from scipy.linalg import svd
 from data_preprocessing import *
 dfjoint, dfRec, dfClas = dataPreprocess()
 
 colNamesMeans, colNamesStd, colNamesExt, colNamesOther = getSpecificColNames()
-dfmeanColumns = dfjoint.loc[:,colNamesMeans]
+dfmeanColumns = dfClas.loc[:,colNamesMeans]
 
 
 ## Select attribute type
-attributeNames = dfmeanColumns
-X_s = mean
+attributeNames = colNamesMeans
+X_s = dfmeanColumns
 
+# X_s = np.empty((X_s.shape[0], X_s.shape[1]))
+# for i, col_id in enumerate(range(1, len(attributeNames))):
+#     X_s[:, i] = np.asarray(doc.col_values(col_id, X_s.shape[0], X_s.shape[1]))
 
-
-N = X_s.shape[1]
-
+N = X_s.shape[0]
+classLabels = dfClas.loc[:,"Diagnosis"]
+classNames = sorted(set(dfClas.loc[:,"Diagnosis"]))
+classDict = dict(zip(classNames, range(2)))
+                 
+y = np.asarray([classDict[value] for value in classLabels])
 ###############################################################################
 ## Start of copied code
 
@@ -94,11 +101,11 @@ plt.show()
 
 
 # Subtract the mean from the data
-Y1 = X_s - np.ones((N, 1))*X_s.mean(0)
+Y1 = X_s - np.ones((N, 1))*X_s.mean(0).to_numpy()
 
 # Subtract the mean from the data and divide by the attribute standard
 # deviation to obtain a standardized dataset:
-Y2 = X_s - np.ones((N, 1))*X_s.mean(0)
+Y2 = X_s - np.ones((N, 1))*X_s.mean(0).to_numpy()
 Y2 = Y2*(1/np.std(Y2,0))
 # Here were utilizing the broadcasting of a row vector to fit the dimensions 
 # of Y2
@@ -137,7 +144,7 @@ for k in range(2):
     for c in range(C):
         plt.plot(Z[y==c,i], Z[y==c,j], '.', alpha=.5)
     plt.xlabel('PC'+str(i+1))
-    plt.xlabel('PC'+str(j+1))
+    plt.ylabel('PC'+str(j+1))
     plt.title(titles[k] + '\n' + 'Projection' )
     plt.legend(classNames)
     plt.axis('equal')
