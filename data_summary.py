@@ -1,6 +1,4 @@
-from data_attributes import *
-
-dfjoint, dfRec, dfClas = dataPreprocess()
+from data_preprocessing import *
 
 def summarizeData(dfjoint: pd.DataFrame, printToConsole = True, save = False) -> pd.DataFrame:
     summarizedData = dfjoint.describe()
@@ -10,3 +8,8 @@ def summarizeData(dfjoint: pd.DataFrame, printToConsole = True, save = False) ->
         print(summarizedData)
 
     return summarizedData
+
+
+if __name__ ==  '__main__':
+    dfjoint, dfRec, dfClas = dataPreprocess()
+    summarizeData(dfjoint, save = True)
