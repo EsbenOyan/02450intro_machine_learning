@@ -95,6 +95,7 @@ def dataPreprocess() -> tuple[pd.DataFrame, pd.DataFrame, pd.DataFrame]:
     dfjoint = dfjoint.drop(sharedColumnsRec, axis = 1)
     jointColNames = [column if ' clas' not in column else column[:-5] for column in dfjoint.columns]
     dfjoint.columns = jointColNames
+    dfjoint['lymph node status'] = dfjoint['lymph node status'].apply(pd.to_numeric)
 
     # we can create a subdataframe containing only columns found in the classification dataset
     clasHeader.remove('patient ID')

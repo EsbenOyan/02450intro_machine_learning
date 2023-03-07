@@ -4,6 +4,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.decomposition import PCA
 import seaborn as sns
 import numpy as np
+from scipy.linalg import svd
 
 from data_preprocessing import *
 dfjoint, dfRec, dfClas = dataPreprocess()
@@ -12,12 +13,9 @@ colNamesMeans, colNamesStd, colNamesExt, colNamesOther = getSpecificColNames()
 mean = dfjoint.loc[:,colNamesMeans]
 sde = dfjoint.loc[:,colNamesStd]
 worst = dfjoint.loc[:,colNamesExt]
-colNames = colNamesMeans + colNamesStd + colNamesExt + ["tumor size", "time"]
+colNames = colNamesMeans + colNamesStd + colNamesExt
 
-def plot_variance(data, title):
-    # Select the columns to use in PCA
-    features = data.iloc[:, 0:10]
-
+def plot_variance(features, title):
     # Scale the features to have zero mean and unit variance
     scaler = MinMaxScaler()
     scaled_features = scaler.fit_transform(features)
@@ -56,31 +54,15 @@ def plot_variance(data, title):
     plt.close()
 
 # Plot variance for "mean" dataset
-plot_variance(mean, 'Mean')
-
-# Plot variance for "sde" dataset
-plot_variance(sde, 'SDE')
-
-# Plot variance for "worst" dataset
-plot_variance(worst, 'Worst')
+plot_variance(dfjoint.loc[:,colNames], 'PCA')
 
 ###############################################################################
                 #2.1.6 Insertion#
 ###############################################################################
 
 ## Data preprocessing
-
-from scipy.linalg import svd
-from data_preprocessing import *
-dfjoint, dfRec, dfClas = dataPreprocess()
-
-colNamesMeans, colNamesStd, colNamesExt, colNamesOther = getSpecificColNames()
-dfmeanColumns = dfClas.loc[:,colNamesMeans]
-
-
-## Select attribute type
-attributeNames = colNamesMeans
-X_s = dfmeanColumns
+attributeNames = colNames
+X_s = dfClas.loc[:, colNames]
 
 # X_s = np.empty((X_s.shape[0], X_s.shape[1]))
 # for i, col_id in enumerate(range(1, len(attributeNames))):
@@ -95,6 +77,7 @@ y = np.asarray([classDict[value] for value in classLabels])
 ###############################################################################
 ## Start of copied code
 
+"""
 r = np.arange(1,X_s.shape[1]+1)
 plt.bar(r, np.std(X_s,0))
 plt.xticks(r, attributeNames, rotation=45, ha='right')
@@ -102,7 +85,7 @@ plt.ylabel('Standard deviation')
 plt.xlabel('Attributes')
 plt.title('Breastcancer: attribute standard deviations')
 plt.show()
-
+"""
 
 # Subtract the mean from the data
 Y1 = X_s - np.ones((N, 1))*X_s.mean(0).to_numpy()
@@ -126,8 +109,9 @@ j = 1
 plt.figure(figsize=(10,15))
 plt.subplots_adjust(hspace=.4)
 plt.title('Breastcancer: Effect of standardization')
-nrows=3
-ncols=2
+nrows=1
+ncols=1
+
 for k in range(2):
     # Obtain the PCA solution by calculate the SVD of either Y1 or Y2
     U,S,Vh = svd(Ys[k],full_matrices=False)
@@ -143,16 +127,18 @@ for k in range(2):
     Z = U*S;
     
     # Plot projection
-    plt.subplot(nrows, ncols, 1+k)
+    plt.subplots(nrows, ncols)
     C = len(classNames)
     for c in range(C):
         plt.plot(Z[y==c,i], Z[y==c,j], '.', alpha=.5)
     plt.xlabel('PC'+str(i+1))
     plt.ylabel('PC'+str(j+1))
-    plt.title(titles[k] + '\n' + 'Projection' )
+    plt.title('PCA analysis of breast cancer dataset')
     plt.legend(classNames)
     plt.axis('equal')
+    plt.savefig('PCA_Diagnosis', bbox_inches = 'tight')
     
+    """
     # Plot attribute coefficients in principal component space
     plt.subplot(nrows, ncols,  3+k)
     for att in range(V.shape[1]):
@@ -168,18 +154,46 @@ for k in range(2):
          np.sin(np.arange(0, 2*np.pi, 0.01)));
     plt.title(titles[k] +'\n'+'Attribute coefficients')
     plt.axis('equal')
-            
+    """     
     # Plot cumulative variance explained
-    plt.subplot(nrows, ncols,  5+k);
+    plt.subplots(1,1)
     plt.plot(range(1,len(rho)+1),rho,'x-')
     plt.plot(range(1,len(rho)+1),np.cumsum(rho),'o-')
     plt.plot([1,len(rho)],[threshold, threshold],'k--')
-    plt.title('Variance explained by principal components');
-    plt.xlabel('Principal component');
-    plt.ylabel('Variance explained');
+    plt.xlabel('Principal component')
+    plt.ylabel('Variance explained')
     plt.legend(['Individual','Cumulative','Threshold'])
     plt.grid()
-    plt.title(titles[k]+'\n'+'Variance explained')
+    plt.title('Variance explained by principal components')
+    plt.savefig('PCA_Diagnosis_explained_variance', bbox_inches = 'tight')
 
-plt.show()
+df = pd.DataFrame(V)
+PC1 = df.iloc[:,0]
+PC2 = df.iloc[:,1]
+PC3 = df.iloc[:,2]
+print(PC1)
 
+fig, ax = plt.subplots(3,1, sharex = True, figsize = (18,12))
+ax[0].set_title('PC1 weights', fontsize = 20)
+ax[1].set_title('PC2 weights', fontsize = 20)
+ax[2].set_title('PC3 weights', fontsize = 20)
+
+ax[2].set_xticklabels(colNames, rotation = 90, fontsize = 20)
+
+ax[0].set_ylabel('')
+ax[1].set_ylabel('')
+ax[2].set_ylabel('')
+
+sns.despine(ax = ax[0])
+sns.despine(ax = ax[1])
+sns.despine(ax = ax[2])
+
+colorPalette = sns.light_palette("seagreen", reverse = True, n_colors=len(colNames))
+
+sns.barplot(ax = ax[0], x = colNames, y = PC1, palette = colorPalette)
+sns.barplot(ax = ax[1], x = colNames, y = PC2, palette = colorPalette)
+sns.barplot(ax = ax[2], x = colNames, y = PC3, palette = colorPalette)
+
+fig.tight_layout()
+
+plt.savefig('test.png', bbox_inches = 'tight')
