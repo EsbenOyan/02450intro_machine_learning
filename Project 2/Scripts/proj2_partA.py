@@ -54,14 +54,14 @@ residual = y_est-y
 r_sq = model.score(X, y)
 print(f"coefficient of determination: {r_sq}")
 #print(f"intercept: {model.intercept_}")
-#print(f"slope: {model.coef_}")
+print(f"slope: {model.coef_}\n")
 
 # Display scatter plot
 figure()
 plot(y, y_est, '.')
 xlabel('Time until recurrence'); ylabel('Estimated recurrence time');
 #hist(residual,40)
-
+plt.savefig('../y_on_y_corr.png')
 show()
 
 
@@ -69,6 +69,7 @@ show()
 ## Implement ex8_1_1.py
 
 attributeNames = ['offset'] + list(X_cols)[:10] + list(X_cols)[-2:]
+print(attributeNames)
 N, M = X.shape
 
 ## Crossvalidation
@@ -165,7 +166,7 @@ for train_index, test_index in CV.split(X,y):
     #print('Test indices: {0}\n'.format(test_index))
 
     k+=1
-
+plt.savefig('../reg_para.png')
 show()
 # Display results
 print('Linear regression without feature selection:')

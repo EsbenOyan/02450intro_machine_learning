@@ -53,14 +53,37 @@ classNames = sorted(set(dfRec.loc[:,"time_discretized"]))
 classDict = dict(zip(classNames, range(4)))
 y = np.asarray([classDict[value] for value in classLabels])
 
+######################
+# Split dataset into features and target vector
+colNames = dfjoint.columns
+y = dfjoint.loc[:,'time'].dropna()
+y = y.to_numpy()
+
+# Columns to base regression on. Here certain columns are dropped.
+X_cols = colNames.drop(['Diagnosis', 'time', 'outcome'])
+
+X = dfjoint.loc[:, X_cols].dropna()
+
+# Further drop columns using regex
+X = X[X.columns.drop(list(X.filter(regex='std')))]
+X = X[X.columns.drop(list(X.filter(regex='extreme')))]
+
+# Feature transformation and add offset
+X = X - np.outer(np.ones((len(y), 1)),X.mean(0))
+X = X*(1/np.std(X,0))
+X = np.concatenate((np.ones((X.shape[0],1)), X), 1)
+######################
+
 # Define data dimensions
 N = X.shape[0]
-M = len(attributeNames)
+M = X.shape[1]
 # M = M + 1
 C = len(classNames)
 
+
+
 # Add bias to input data
-X = np.concatenate((np.ones((X.shape[0],1)), X), 1)
+# X = np.concatenate((np.ones((X.shape[0],1)), X), 1)
 
 
 #######################################################################
